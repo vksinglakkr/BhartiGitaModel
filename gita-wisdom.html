@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gita Wisdom — गीता ज्ञान</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Eczar:wght@500;600;700&family=Hind:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo: #1B1F3B;
+    --indigo-deep: #11142A;
+    --indigo-panel: #20254A;
+    --saffron: #E8871E;
+    --saffron-soft: rgba(232,135,30,0.16);
+    --gold: #C9A227;
+    --parchment: #F3E9D2;
+    --parchment-dim: #B9AF92;
+    --rose: #C9594F;
+    --rule: rgba(201,162,39,0.28);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin:0;
+    height:100%;
+    background: var(--indigo);
+    color: var(--parchment);
+    font-family: 'Hind', sans-serif;
+  }
+
+  body{
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+  }
+
+  /* ---------- Header ---------- */
+  header.topbar{
+    flex:0 0 auto;
+    padding: 18px clamp(14px, 4vw, 40px) 14px;
+    border-bottom: 1px solid var(--rule);
+    background: linear-gradient(180deg, var(--indigo-deep), var(--indigo));
+  }
+
+  .topbar-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+
+  .brand h1{
+    font-family:'Eczar', serif;
+    font-weight:700;
+    font-size: clamp(20px, 3vw, 26px);
+    margin:0;
+    letter-spacing:0.2px;
+    color: var(--parchment);
+  }
+
+  .brand .deva{
+    font-family:'Eczar', serif;
+    font-size: clamp(15px, 2.4vw, 18px);
+    color: var(--gold);
+    opacity:0.9;
+  }
+
+  .tagline{
+    margin:4px 0 0;
+    font-size:13px;
+    color: var(--parchment-dim);
+    letter-spacing:0.2px;
+  }
+
+  .controls{
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-top:14px;
+  }
+
+  .pill-group{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  .pill-group .group-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color: var(--parchment-dim);
+    margin-right:4px;
+  }
+
+  .pill{
+    border:1px solid var(--rule);
+    background: transparent;
+    color: var(--parchment-dim);
+    font-family:'Hind', sans-serif;
+    font-size:13px;
+    font-weight:500;
+    padding:6px 13px;
+    border-radius:999px;
+    cursor:pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .pill:hover{ border-color: var(--gold); color: var(--parchment); }
+
+  .pill[aria-pressed="true"]{
+    background: var(--saffron-soft);
+    border-color: var(--saffron);
+    color: var(--saffron);
+  }
+
+  .pill:focus-visible{
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Hero verse strip ---------- */
+  .hero{
+    flex:0 0 auto;
+    padding: 14px clamp(14px, 4vw, 40px);
+    text-align:center;
+    border-bottom: 1px solid var(--rule);
+    min-height: 64px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .verse-rotator{
+    position:relative;
+    width:100%;
+    max-width:760px;
+  }
+
+  .verse-slide{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition: opacity 1.1s ease;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+
+  .verse-slide.active{
+    position:relative;
+    opacity:1;
+  }
+
+  .verse-sanskrit{
+    font-family:'Eczar', serif;
+    font-size: clamp(14px, 2vw, 17px);
+    color: var(--gold);
+  }
+
+  .verse-gloss{
+    font-size:12.5px;
+    color: var(--parchment-dim);
+  }
+
+  .verse-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color: var(--parchment-dim);
+    letter-spacing:0.05em;
+  }
+
+  /* ---------- Conversation thread ---------- */
+  main.thread{
+    flex:1 1 auto;
+    overflow-y:auto;
+    padding: 22px clamp(14px, 4vw, 40px) 10px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+
+  .empty-state{
+    margin: auto;
+    max-width:420px;
+    text-align:center;
+    color: var(--parchment-dim);
+    font-size:14.5px;
+    line-height:1.6;
+  }
+
+  .empty-state strong{
+    display:block;
+    color: var(--parchment);
+    font-family:'Eczar', serif;
+    font-size:18px;
+    margin-bottom:6px;
+    font-weight:600;
+  }
+
+  .row{
+    display:flex;
+    width:100%;
+  }
+
+  .row.user{ justify-content:flex-end; }
+  .row.assistant{ justify-content:flex-start; }
+
+  .bubble{
+    max-width: min(640px, 86%);
+    padding:12px 16px;
+    line-height:1.55;
+    font-size:15px;
+  }
+
+  .bubble.question{
+    background: var(--saffron-soft);
+    border: 1px solid var(--saffron);
+    color: var(--parchment);
+    border-radius: 14px 14px 4px 14px;
+  }
+
+  .bubble.answer{
+    background: var(--indigo-panel);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px 14px 14px 14px;
+    color: var(--parchment);
+  }
+
+  .bubble.answer.pending{
+    color: var(--parchment-dim);
+    font-style:italic;
+  }
+
+  .bubble.answer.error{
+    border-left-color: var(--rose);
+    color: var(--parchment);
+  }
+
+  .citation-chip{
+    display:inline-block;
+    margin-top:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.04em;
+    color: var(--indigo-deep);
+    background: var(--gold);
+    padding:3px 9px;
+    border-radius:999px;
+  }
+
+  .dots span{
+    display:inline-block;
+    width:5px; height:5px;
+    margin-right:3px;
+    border-radius:50%;
+    background: var(--parchment-dim);
+    animation: blink 1.2s infinite;
+  }
+  .dots span:nth-child(2){ animation-delay:0.2s; }
+  .dots span:nth-child(3){ animation-delay:0.4s; }
+
+  @keyframes blink{
+    0%, 80%, 100% { opacity:0.25; }
+    40% { opacity:1; }
+  }
+
+  /* ---------- Composer ---------- */
+  form.composer{
+    flex:0 0 auto;
+    display:flex;
+    align-items:flex-end;
+    gap:10px;
+    padding: 14px clamp(14px, 4vw, 40px) 18px;
+    border-top: 1px solid var(--rule);
+    background: var(--indigo-deep);
+  }
+
+  textarea#question{
+    flex:1 1 auto;
+    resize:none;
+    min-height:46px;
+    max-height:140px;
+    padding:12px 14px;
+    border-radius:12px;
+    border:1px solid var(--rule);
+    background: var(--indigo-panel);
+    color: var(--parchment);
+    font-family:'Hind', sans-serif;
+    font-size:15px;
+    line-height:1.4;
+  }
+
+  textarea#question::placeholder{ color: var(--parchment-dim); }
+
+  textarea#question:focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:1px;
+  }
+
+  button#send{
+    flex:0 0 auto;
+    width:46px; height:46px;
+    border-radius:50%;
+    border:1px solid var(--saffron);
+    background: var(--saffron);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition: filter 0.15s;
+  }
+
+  button#send:hover{ filter:brightness(1.08); }
+  button#send:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  button#send:focus-visible{
+    outline:2px solid var(--gold);
+    outline-offset:2px;
+  }
+
+  button#send svg{ width:20px; height:20px; }
+
+  footer.note{
+    flex:0 0 auto;
+    text-align:center;
+    font-size:11px;
+    color: var(--parchment-dim);
+    padding-bottom:10px;
+    background: var(--indigo-deep);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .verse-slide{ transition:none; }
+    .dots span{ animation:none; opacity:0.6; }
+  }
+
+  @media (max-width: 480px){
+    .bubble{ max-width: 92%; font-size:14.5px; }
+    .brand h1{ font-size:19px; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-row">
+      <div class="brand">
+        <h1>Gita Wisdom</h1>
+        <span class="deva">गीता ज्ञान</span>
+      </div>
+    </div>
+    <p class="tagline">Ask a question. The answer comes from the Bhagavad Gita.</p>
+
+    <div class="controls">
+      <div class="pill-group" id="style-group" role="group" aria-label="Answer style">
+        <span class="group-label">Style</span>
+        <button class="pill" type="button" data-value="simple" aria-pressed="true">Simple</button>
+        <button class="pill" type="button" data-value="reflective" aria-pressed="false">Reflective</button>
+        <button class="pill" type="button" data-value="scholarly" aria-pressed="false">Scholarly</button>
+      </div>
+      <div class="pill-group" id="language-group" role="group" aria-label="Answer language">
+        <span class="group-label">Language</span>
+        <button class="pill" type="button" data-value="english" aria-pressed="true">English</button>
+        <button class="pill" type="button" data-value="hindi" aria-pressed="false">हिन्दी</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero" aria-hidden="true">
+    <div class="verse-rotator" id="verse-rotator"></div>
+  </section>
+
+  <main class="thread" id="thread" aria-live="polite">
+    <div class="empty-state" id="empty-state">
+      <strong>Where shall we begin?</strong>
+      Ask about duty, fear, attachment, purpose, or loss — anything you're sitting with. The reply will be grounded in the Gita's own verses, in the style and language you choose above.
+    </div>
+  </main>
+
+  <form class="composer" id="composer">
+    <textarea id="question" placeholder="Type your question…" rows="1" required></textarea>
+    <button id="send" type="submit" aria-label="Send question">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 12 L13 7 L9 12 L13 17 Z" fill="#11142A"/>
+      </svg>
+    </button>
+  </form>
+
+  <footer class="note">Answers are generated and may not capture every nuance of the text — read the verse cited for yourself.</footer>
+
+<script>
+  // -----------------------------------------------------------------
+  // CONFIG — replace with your own n8n production webhook URL
+  // e.g. "https://your-n8n-host.com/webhook/gita-wisdom"
+  // -----------------------------------------------------------------
+  const N8N_WEBHOOK_URL = "PASTE_YOUR_N8N_WEBHOOK_URL_HERE";
+
+  // -----------------------------------------------------------------
+  // Style + language pill toggles
+  // -----------------------------------------------------------------
+  let currentStyle = "simple";
+  let currentLanguage = "english";
+
+  function wireGroup(groupId, onSelect){
+    const group = document.getElementById(groupId);
+    group.querySelectorAll(".pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        group.querySelectorAll(".pill").forEach(b => b.setAttribute("aria-pressed", "false"));
+        btn.setAttribute("aria-pressed", "true");
+        onSelect(btn.dataset.value);
+      });
+    });
+  }
+
+  wireGroup("style-group", v => currentStyle = v);
+  wireGroup("language-group", v => currentLanguage = v);
+
+  // -----------------------------------------------------------------
+  // Ambient hero — a few verses crossfading quietly
+  // -----------------------------------------------------------------
+  const verses = [
+    { sa: "कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।", en: "You have a right to your actions, never to their fruits.", tag: "BG 2.47" },
+    { sa: "यदा यदा हि धर्मस्य ग्लानिर्भवति भारत।", en: "Whenever righteousness wanes, balance is restored.", tag: "BG 4.7" },
+    { sa: "श्रेयान्स्वधर्मो विगुणः परधर्मात्स्वनुष्ठितात्।", en: "Better one's own imperfect path than another's followed perfectly.", tag: "BG 3.35" },
+    { sa: "उद्धरेदात्मनात्मानं नात्मानमवसादयेत्।", en: "Lift yourself by your own self; do not let yourself sink.", tag: "BG 6.5" }
+  ];
+
+  const rotator = document.getElementById("verse-rotator");
+  verses.forEach((v, i) => {
+    const el = document.createElement("div");
+    el.className = "verse-slide" + (i === 0 ? " active" : "");
+    el.innerHTML = `<span class="verse-sanskrit">${v.sa}</span><span class="verse-gloss">${v.en}</span><span class="verse-tag">${v.tag}</span>`;
+    rotator.appendChild(el);
+  });
+
+  let verseIndex = 0;
+  setInterval(() => {
+    const slides = rotator.querySelectorAll(".verse-slide");
+    slides[verseIndex].classList.remove("active");
+    verseIndex = (verseIndex + 1) % slides.length;
+    slides[verseIndex].classList.add("active");
+  }, 9000);
+
+  // -----------------------------------------------------------------
+  // Conversation thread
+  // -----------------------------------------------------------------
+  const thread = document.getElementById("thread");
+  const emptyState = document.getElementById("empty-state");
+  const form = document.getElementById("composer");
+  const input = document.getElementById("question");
+  const sendBtn = document.getElementById("send");
+
+  // grow textarea as the user types, up to max-height set in CSS
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = input.scrollHeight + "px";
+  });
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey){
+      e.preventDefault();
+      form.requestSubmit();
+    }
+  });
+
+  function scrollToBottom(){
+    thread.scrollTop = thread.scrollHeight;
+  }
+
+  function addQuestionBubble(text){
+    if (emptyState) emptyState.remove();
+    const row = document.createElement("div");
+    row.className = "row user";
+    row.innerHTML = `<div class="bubble question"></div>`;
+    row.querySelector(".bubble").textContent = text;
+    thread.appendChild(row);
+    scrollToBottom();
+  }
+
+  function addPendingAnswer(){
+    const row = document.createElement("div");
+    row.className = "row assistant";
+    row.innerHTML = `<div class="bubble answer pending">Reflecting on the verses <span class="dots"><span></span><span></span><span></span></span></div>`;
+    thread.appendChild(row);
+    scrollToBottom();
+    return row;
+  }
+
+  function fillAnswer(row, answer, citation){
+    const bubble = row.querySelector(".bubble");
+    bubble.classList.remove("pending");
+    bubble.textContent = answer;
+    if (citation){
+      const chip = document.createElement("span");
+      chip.className = "citation-chip";
+      chip.textContent = citation;
+      bubble.appendChild(document.createElement("br"));
+      bubble.appendChild(chip);
+    }
+    scrollToBottom();
+  }
+
+  function fillError(row, message){
+    const bubble = row.querySelector(".bubble");
+    bubble.classList.remove("pending");
+    bubble.classList.add("error");
+    bubble.textContent = message;
+    scrollToBottom();
+  }
+
+  async function askGita(question){
+    const res = await fetch(N8N_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, style: currentStyle, language: currentLanguage })
+    });
+    if (!res.ok) throw new Error("Request failed with status " + res.status);
+    return res.json();
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const question = input.value.trim();
+    if (!question) return;
+
+    addQuestionBubble(question);
+    input.value = "";
+    input.style.height = "auto";
+    sendBtn.disabled = true;
+
+    const pendingRow = addPendingAnswer();
+
+    try{
+      const data = await askGita(question);
+      const answer = (data && data.answer) ? data.answer : "No answer came back. Please try again.";
+      fillAnswer(pendingRow, answer, data ? data.citation : null);
+    } catch(err){
+      fillError(pendingRow, "Couldn't reach the wisdom service. Check the webhook URL in this file and confirm the n8n workflow is active, then try again.");
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  });
+</script>
+
+</body>
+</html>
