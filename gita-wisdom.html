@@ -249,6 +249,7 @@
   .citation-chip{
     display:inline-block;
     margin-top:10px;
+    margin-right:8px;
     font-family:'IBM Plex Mono', monospace;
     font-size:11.5px;
     letter-spacing:0.04em;
@@ -256,6 +257,15 @@
     background: var(--gold);
     padding:3px 9px;
     border-radius:999px;
+  }
+
+  .model-tag{
+    display:inline-block;
+    margin-top:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.03em;
+    color: var(--parchment-dim);
   }
 
   .dots span{
@@ -403,7 +413,7 @@
   // CONFIG — replace with your own n8n production webhook URL
   // e.g. "https://your-n8n-host.com/webhook/gita-wisdom"
   // -----------------------------------------------------------------
-  const N8N_WEBHOOK_URL = "https://n8n-workflow-test.duckdns.org/webhook/gita-wisdom";
+  const N8N_WEBHOOK_URL = "PASTE_YOUR_N8N_WEBHOOK_URL_HERE";
 
   // -----------------------------------------------------------------
   // Style + language pill toggles
@@ -496,16 +506,24 @@
     return row;
   }
 
-  function fillAnswer(row, answer, citation){
+  function fillAnswer(row, answer, citation, model){
     const bubble = row.querySelector(".bubble");
     bubble.classList.remove("pending");
     bubble.textContent = answer;
+    if (citation || model){
+      bubble.appendChild(document.createElement("br"));
+    }
     if (citation){
       const chip = document.createElement("span");
       chip.className = "citation-chip";
       chip.textContent = citation;
-      bubble.appendChild(document.createElement("br"));
       bubble.appendChild(chip);
+    }
+    if (model){
+      const tag = document.createElement("span");
+      tag.className = "model-tag";
+      tag.textContent = "via " + model;
+      bubble.appendChild(tag);
     }
     scrollToBottom();
   }
@@ -543,7 +561,7 @@
     try{
       const data = await askGita(question);
       const answer = (data && data.answer) ? data.answer : "No answer came back. Please try again.";
-      fillAnswer(pendingRow, answer, data ? data.citation : null);
+      fillAnswer(pendingRow, answer, data ? data.citation : null, data ? data.model : null);
     } catch(err){
       fillError(pendingRow, "Couldn't reach the wisdom service. Check the webhook URL in this file and confirm the n8n workflow is active, then try again.");
     } finally {
